@@ -3,7 +3,7 @@
 const express = require('express')
 
 const app = express()
-const port = 5000
+// const port = 5000
 
 app.use(express.json());
 
@@ -11,26 +11,12 @@ const { writeFile, readFile } = require('fs')
 const util = require('util')
 const writeFileAsync = util.promisify(writeFile)
 const readFileAsync = util.promisify(readFile)
-var unicornsJSON = []
+var unicornsJSON = [];
 
-(process.env.PORT || 5000, async function (err) {
+app.listen(process.env.PORT || 5000, function (err) {
     if (err)
         console.log(err);
-
-    try {
-      unicornsJSON = await readFileAsync('./data.json', 'utf-8')
-      if (!unicornsJSON) {
-        console.log("Could not read the file");
-        return
-      }
-      unicornsJSON = JSON.parse(unicornsJSON)
-      console.log(unicornsJSON);
-    } catch (error) {
-      console.log(error);
-    }
-  
-    console.log(`Example app listening on port ${port}`)
-  })
+})
 
 app.get('/api/v1/unicorns', (req, res) => {
     // res.send('All the unicorns')
