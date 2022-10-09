@@ -9,6 +9,7 @@ const { Schema } = mongoose;
 app.use(express.json())
 
 const unicornSchema = new Schema({
+  "_id" : ObjectId,
   "name": String, // String is shorthand for {type: String}
   "weight": Number,
   "loves": [String],
@@ -120,7 +121,7 @@ app.patch('/api/v2/unicorn/:id', (req, res) => {
     console.log(res)
   });
 
-  res.send("Updated successfully")
+  res.send("Updated successfully!")
 })
 
 app.delete('/api/v2/unicorn/:id', (req, res) => {
@@ -135,7 +136,7 @@ app.delete('/api/v2/unicorn/:id', (req, res) => {
     if (err) console.log(err);
     console.log(result);
   });
-  
+
   res.send("Deleted successfully?")
 })
 

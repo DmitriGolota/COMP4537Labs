@@ -23,7 +23,7 @@ const unicornModel = mongoose.model('unicorns', unicornSchema); // unicorns is t
 
 app.listen(process.env.PORT || 5000, async function (err) {
   try {
-    await mongoose.connect('mongodb+srv://root:G3YrA9HKolMud0m5@cluster0.fha6ifp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+    await mongoose.connect('mongodb+srv://root:G3YrA9HKolMud0m5@cluster0.fha6ifp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',{ useNewUrlParser: true, dbName: 'test', useUnifiedTopology: true })
   } catch (error) {
     console.log('db error');
   }
@@ -82,7 +82,7 @@ app.get('/api/v2/unicorn/:id', (req, res) => {
 
   // Find method bypass iterating through a DB -> much quick with mongodb
   console.log(req.params.id);
-  unicornModel.find({ _id: `${req.params.id}` })
+  unicornModel.find({ _id: req.params.id })
     .then(doc => {
       console.log(doc)
       res.json(doc)
@@ -120,7 +120,7 @@ app.patch('/api/v2/unicorn/:id', (req, res) => {
     console.log(res)
   });
 
-  res.send("Updated successfully")
+  res.send("Updated successfully!")
 })
 
 app.delete('/api/v2/unicorn/:id', (req, res) => {
@@ -135,7 +135,7 @@ app.delete('/api/v2/unicorn/:id', (req, res) => {
     if (err) console.log(err);
     console.log(result);
   });
-  
+
   res.send("Deleted successfully?")
 })
 
