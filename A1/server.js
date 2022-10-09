@@ -92,7 +92,7 @@ app.get('/api/v1/pokemons', async (req, res) => {
         })
         .catch(err => {
             console.error(err);
-            res.json({errMsg:'Error Reading Database'});
+            res.status(422).json({errMsg:'Error Reading Database'});
         })
 })
 // create new pokemon
@@ -103,7 +103,7 @@ app.post('/api/v1/pokemon', (req, res) => {
             pokemonSchema.create(req.body, function (err, result) {
                 if (err) {
                     console.log(err)
-                    res.json({errMsg: 'ValidationError: check your ...'})
+                    res.status(422).json({errMsg: 'ValidationError: check your ...'})
                 } else {
                     console.log(result)
                     console.log('New Pokemon Saved Successfully')
@@ -111,7 +111,7 @@ app.post('/api/v1/pokemon', (req, res) => {
                 }
             })
         } else {
-            res.json({errMsg : {
+            res.status(422).json({errMsg : {
                 code: "11000"
             }});
         }
@@ -128,14 +128,14 @@ app.get('/api/v1/pokemon/:id', async (req, res) => {
     pokemonSchema.find({ id: req.params.id })
         .then(data => {
             if (data.length == 0) {
-                res.json({ Error: 'Pokemon Not Found' })
+                res.status(404).json({ Error: 'Pokemon Not Found' })
             } else {
                 res.json(data);
             }
         })
         .catch(err => {
             console.error(err);
-            res.json({errMsg: "Cast Error: pass pokemon id between 1 and 811"})
+            res.status(422).json({errMsg: "Cast Error: pass pokemon id between 1 and 811"})
         })
 
 })
@@ -152,11 +152,11 @@ app.put('/api/v1/pokemon/:id', (req, res) => {
     const { _id, ...rest } = req.body;
     pokemonSchema.updateOne({ id: req.params.id }, { $set: { ...rest } }, { upsert: true, runValidators: true }, function (err, result) {
         if (err) {
-            res.json({errMsg: "ValidationError: check your ..."})
+            res.status(422).json({errMsg: "ValidationError: check your ..."})
             return
         } else {
             if(result.upsertedCount > 0) {
-                res.json({msg: 'Not found'})
+                res.status(404).json({msg: 'Not found'})
                 return
             }
         }
@@ -173,11 +173,11 @@ app.patch('/api/v1/pokemon/:id', (req, res) => {
     pokemonSchema.updateOne({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, result) {
         if (err) {
             console.log(err)
-            res.json({errMsg: 'Dangerous operation'})
+            res.status(422).json({errMsg: 'Dangerous operation'})
             return
         } else {
             if(result.modifiedCount == 0) {
-                res.json({msg: 'pokemon not found'})
+                res.status(404).json({msg: 'pokemon not found'})
                 return
             }
         }
@@ -190,21 +190,18 @@ app.patch('/api/v1/pokemon/:id', (req, res) => {
 
 // - delete a  pokemon 
 app.delete('/api/v1/pokemon/:id', (req, res) => {
-    let response = null
     pokemonSchema.deleteOne({ id: req.params.id }, function (err, result) {
         if (err) {
             console.log(err);
-            response = { errMsg: err }
+            res.status(422).json({ errMsg: err })
         } else {
             if (result.deletedCount === 0) {
-                response = { errMsg: "Pokemon not found" }
+                res.status(404).json({ errMsg: "Pokemon not found" })
 
             } else {
-                response = { msg: 'Deleted Successfully' }
+                res.json({ msg: 'Deleted Successfully' })
             }
-            console.log(result)
         }
-        res.json(response)
     })
     return
 })   
@@ -214,5 +211,5 @@ app.get('/api/doc', (req, res) => {
 })
 
 app.get('/*', async (req, res) => {
-    res.json({msg: 'Improper route. Check API docs plz.'})
+    res.status(404).json({msg: 'Improper route. Check API docs plz.'})
 })
