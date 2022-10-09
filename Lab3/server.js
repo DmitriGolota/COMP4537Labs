@@ -16,10 +16,18 @@ var unicornsJSON = [];
 app.listen(process.env.PORT || 5000, function (err) {
     if (err)
         console.log(err);
+    readFileAsync('./data.json', 'utf-8')
+    .then((element) => {
+        unicornsJSON.push(JSON.parse(element))
+    })
+    
+    
 })
 
 app.get('/api/v1/unicorns', (req, res) => {
     // res.send('All the unicorns')
+    
+    unicornsJSON.push()
     res.json(unicornsJSON)
 })
 
