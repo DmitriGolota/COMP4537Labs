@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
 const cors = require('cors')
-const fetch = require('node-fetch')
+const { default: axios } = require('axios');
 
 
 const app = express()
@@ -18,7 +18,7 @@ app.use(cors())
 
 // Data processing
 async function getPokemonData() {
-    let data = await fetch(POKEDEX_URL)
+    axios.get(POKEDEX_URL)
     return data.json()
 }
 

@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
 const cors = require('cors')
-const fetch = require('node-fetch')
+const https = require('https');
 
 
 const app = express()
@@ -18,13 +18,17 @@ app.use(cors())
 
 // Data processing
 async function getPokemonData() {
-    let data = await fetch(POKEDEX_URL)
-    return data.json()
+    let data = await https.get(POKEDEX_URL, res => {
+        return res.json()
+    })
+    return data
 }
 
 async function getTypes() {
-    let data = await fetch(POKEMON_TYPES_URL)
-    return data.json()
+    let data = await https.get(POKEMON_TYPES_URL, res => {
+        return res.json()
+    })
+    return data
 }
 
 async function getImageURLString(pokemonID) {

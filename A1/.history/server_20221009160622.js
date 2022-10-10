@@ -2,7 +2,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
 const cors = require('cors')
-const fetch = require('node-fetch')
 
 
 const app = express()

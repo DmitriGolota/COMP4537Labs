@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
 const cors = require('cors')
-const fetch = require('node-fetch')
+const axios = require('axios');
 
 
 const app = express()
@@ -18,13 +18,17 @@ app.use(cors())
 
 // Data processing
 async function getPokemonData() {
-    let data = await fetch(POKEDEX_URL)
-    return data.json()
+    axios.get(POKEDEX_URL).then((res) => {
+        return res.json()
+    })
+
 }
 
 async function getTypes() {
-    let data = await fetch(POKEMON_TYPES_URL)
-    return data.json()
+    axios.get(POKEMON_TYPES_URL).then((res) => {
+        return res.json()
+    })
+
 }
 
 async function getImageURLString(pokemonID) {
