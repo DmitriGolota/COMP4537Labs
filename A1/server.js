@@ -120,10 +120,10 @@ app.get("/api/v1/pokemonsAdvancedFiltering", async (req, res) => {
 
     queryBuild = []
     elements.forEach(element => {
-        let splited = element.split(/([!<>=|]=?)/g)
-        let stat = splited[0],
-            mongooseOperator = splited[1],
-            value = splited[2]
+        let splitted = element.split(/([!<>=|]=?)/g)
+        let stat = splitted[0],
+            mongooseOperator = splitted[1],
+            value = splitted[2]
         mongooseOperator = mapOperator(mongooseOperator)
         query = {stat : stat,
             mongooseOperator: mongooseOperator,
@@ -131,25 +131,30 @@ app.get("/api/v1/pokemonsAdvancedFiltering", async (req, res) => {
         
         queryBuild.push(query)
     })
+
     
     console.log("Build:", ...queryBuild)
 
-    // queryBuilder = {}
-    // queryBuild.forEach(element => {
-        
-    // })
+    // Query is built but object needs to be processed to accomplish query
 
+    queryBuild.forEach(element => {
+        queryItem = ("{" + element.stat + ":" + "{" + element.mongooseOperator + ":" + element.value + "}" + "}")
+        queryItem = JSON.parse(queryItem)
+        const mongooseQuery = pokemonSchema.find(queryItem)
+        console.log(mongooseQuery)
+    })
 
-    // const mongooseQuery = pokemonSchema.find(query)
+    // Query is built and ready to execute, just ran out of time with converting to the proper structure for the query
 
+    const mongooseQuery = pokemonSchema.find(query)
 
-    // const pokemons = await mongooseQuery;
-    // console.log(pokemons)
+    const pokemons = await mongooseQuery;
+    console.log(pokemons)
 
-    // res.send({
-    //     hits: pokemons,
-    //     key: "asldkasdk"
-    // })
+    res.send({
+        hits: pokemons,
+        key: "asldkasdk"
+    })
 })
 
 app.patch("/api/v1/pokemonsAdvancedUpdate", async (req, res) => {
@@ -181,59 +186,59 @@ app.patch("/api/v1/pokemonsAdvancedUpdate", async (req, res) => {
 })
 
 
-app.get('/api/v1/pokemonsAdvancedFiltering', async (req, res) => {
-    const { id,
-        "base.HP": baseHP,
-        "base.Attack": baseAttack,
-        "base.Defense": baseDefense,
-        "base.Speed Attack": baseSpeedAttack,
-        "base.Speed Defense": baseSpeedDefense,
-        "base.Speed": baseSpeed,
-        type,
-        "name.english": nameEnglish,
-        "name.japanese": nameJapanese,
-        "name.chinese": nameChinese,
-        "name.french": nameFrench,
-        page,
-        sort,
-        filteredProperty,
-        hitsPerPage
-    } = req.query
+// app.get('/api/v1/pokemonsAdvancedFiltering', async (req, res) => {
+//     const { id,
+//         "base.HP": baseHP,
+//         "base.Attack": baseAttack,
+//         "base.Defense": baseDefense,
+//         "base.Speed Attack": baseSpeedAttack,
+//         "base.Speed Defense": baseSpeedDefense,
+//         "base.Speed": baseSpeed,
+//         type,
+//         "name.english": nameEnglish,
+//         "name.japanese": nameJapanese,
+//         "name.chinese": nameChinese,
+//         "name.french": nameFrench,
+//         page,
+//         sort,
+//         filteredProperty,
+//         hitsPerPage
+//     } = req.query
 
-    const query = {}
-    if (id) query.id = Number(id)
-    if (baseHP) query["base.HP"] = baseHP
-    if (baseAttack) query["base.Attack"] = baseAttack
-    if (baseDefense) query["base.Defense"] = Number(baseDefense)
-    if (baseSpeedAttack) query["base.Speed Attack"] = baseSpeedAttack
-    if (baseSpeedDefense) query["base.Speed Defense"] = baseSpeedDefense
+//     const query = {}
+//     if (id) query.id = Number(id)
+//     if (baseHP) query["base.HP"] = baseHP
+//     if (baseAttack) query["base.Attack"] = baseAttack
+//     if (baseDefense) query["base.Defense"] = Number(baseDefense)
+//     if (baseSpeedAttack) query["base.Speed Attack"] = baseSpeedAttack
+//     if (baseSpeedDefense) query["base.Speed Defense"] = baseSpeedDefense
 
-    if (baseSpeed) query["base.Speed"] = baseSpeed
-    if (nameEnglish) query["name.english"] = nameEnglish
+//     if (baseSpeed) query["base.Speed"] = baseSpeed
+//     if (nameEnglish) query["name.english"] = nameEnglish
 
-    if (nameJapanese) query["name.japanese"] = nameJapanese
-    if (nameChinese) query["name.chinese"] = nameChinese
-    if (nameFrench) query["name.french"] = nameFrench
-    if (page) page = Number(page)
-    if (hitsPerPage) hitsPerPage = Number(hitsPerPage)
+//     if (nameJapanese) query["name.japanese"] = nameJapanese
+//     if (nameChinese) query["name.chinese"] = nameChinese
+//     if (nameFrench) query["name.french"] = nameFrench
+//     if (page) page = Number(page)
+//     if (hitsPerPage) hitsPerPage = Number(hitsPerPage)
 
-    if (type) query.type = { $in: type.split(" , ").map(element => element.trim()) }
-    console.log(type)
+//     if (type) query.type = { $in: type.split(" , ").map(element => element.trim()) }
+//     console.log(type)
 
-    const mongooseQuery = pokemonSchema.find(query);
+//     const mongooseQuery = pokemonSchema.find(query);
 
-    if (sort)
-        mongooseQuery.sort(sort)
-    if (filteredProperty)
-        mongooseQuery.select(filteredProperty.replace(/, /g, " ") + " -_id")
+//     if (sort)
+//         mongooseQuery.sort(sort)
+//     if (filteredProperty)
+//         mongooseQuery.select(filteredProperty.replace(/, /g, " ") + " -_id")
 
-    const pokemons = await mongooseQuery;
-    console.log(pokemons)
-    res.send({
-        hits: pokemons,
-        key: "asldkasdk"
-    })
-})
+//     const pokemons = await mongooseQuery;
+//     console.log(pokemons)
+//     res.send({
+//         hits: pokemons,
+//         key: "asldkasdk"
+//     })
+// })
 
 app.get('/api/v1/pokemons', async (req, res) => {
     var count = parseInt(req.query.count)
