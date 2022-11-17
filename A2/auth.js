@@ -25,13 +25,14 @@ const auth = (req, res, next) => {
         console.log(`authenticated admin`)
         next()
       } else {
-        next(new PokemonBadRequest("Access denied. Token is invalid"))
+        next(new PokemonBadRequest("Access denied."))
       }
     }).catch((err) => {
       console.log(err)
       next(new PokemonBadRequest("Token is incorrect or missing"))
     })
   }
+  
 
 
 module.exports = {auth, adminAuth}

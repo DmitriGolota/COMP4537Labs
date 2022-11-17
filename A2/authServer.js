@@ -49,6 +49,7 @@ app.post('/register', asyncWrapper(async (req, res) => {
     const userWithHashedPassword = { ...req.body, password: hashedPassword }
 
     const user = await pokeUser.create(userWithHashedPassword)
+
     res.send(user)
 }))
 
@@ -69,6 +70,7 @@ app.post('/login', asyncWrapper(async (req, res) => {
     // Create and assign a token
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
     res.header('auth-token', token)
+    await pokeUser.findOneAndUpdate({username: username}, {token: token})
 
     res.send(user)
 }))
