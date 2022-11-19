@@ -15,23 +15,27 @@ function pagination({ numberOfPages, currentPage, setCurrentPage }) {
 
 
   return (
-    <div>
+    <div className='button-layer'>
       {(currentPage !== 1) && (<button onClick={prevPage}>prev </button>)}
 
       {
         pageNumbers.map(number => {
           if (number < currentPage + 6 && number > currentPage - 6)
             return (<>
-              <button onClick={() => setCurrentPage(number)} className={(number == currentPage) ? 'active' : ''}>
+              <button onClick={() => setCurrentPage(number)} className={(number == currentPage) ? 'focus' : ''}>
                 {number}
               </button>
+
             </>)
         })
       }
 
-      {(currentPage !== numberOfPages) && <button onClick={nextPage}>
+      {(currentPage !== numberOfPages) && 
+      <div className='button-layer'>
+        <button onClick={nextPage}>
         next
-      </button>}
+      </button>
+      </div>}
     </div>
   )
 }
