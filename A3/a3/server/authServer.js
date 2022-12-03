@@ -19,7 +19,7 @@ const app = express()
 dotenv.config();
 app.use(express.json())
 app.use(cors({
-  exposedHeaders: ['auth-token-access', 'auth-token-refresh']
+  exposedHeaders: ['auth-token-access', 'auth-token-refresh', 'username']
 }))
 
 // Async Wrapper
@@ -69,14 +69,15 @@ app.post('/login', asyncWrapper(async (req, res) => {
     if (!isPasswordCorrect) {
         throw new PokemonBadRequest("Password is incorrect")
     }
-
-    await pokeUser.findOneAndUpdate({username: username}, {active: true})
-
-    // Create and assign a token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
-    res.header('auth-token', token)
-    await pokeUser.findOneAndUpdate({username: username}, {token: token})
-
+ 
+    const accessToken = jwt.sign({ user: user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' })
+    const refreshToken = jwt.sign({ user: user }, process.env.REFRESH_TOKEN_SECRET)
+    refreshTokens.push(refreshToken)
+  
+    res.header('auth-token-access', accessToken)
+    res.header('auth-token-refresh', refreshToken)
+    res.header('username', user.username)
+  
     res.send(user)
 }))
 
@@ -86,8 +87,29 @@ app.post('/logout', asyncWrapper(async (req, res) => {
     res.send("User Logged Out")
   }))
 
-  app.use(handleError)
+app.use(handleError)
 
+let refreshTokens = [] // replace with a db
+app.post('/requestNewAccessToken', asyncWrapper(async (req, res) => {
+  // console.log(req.headers);
+  const refreshToken = req.header('auth-token-refresh')
+  if (!refreshToken) {
+    throw new PokemonBadRequest("No Token: Please provide a token.")
+  }
+  if (!refreshTokens.includes(refreshToken)) { // replaced a db access
+    console.log("token: ", refreshToken);
+    console.log("refreshTokens", refreshTokens);
+    throw new PokemonAuthError("Invalid Token: Please provide a valid token.")
+  }
+  try {
+    const payload = await jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+    const accessToken = jwt.sign({ user: payload.user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' })
+    res.header('auth-token-access', accessToken)
+    res.send("Success")
+  } catch (error) {
+    throw new PokemonBadRequest("Invalid Token: Please provide a valid token.")
+  }
+}))
 module.export  = {asyncWrapper}
 
 

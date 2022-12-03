@@ -9,11 +9,12 @@ function Report({ id, accessToken, setAccessToken, refreshToken }) {
   useEffect(() => {
     const start = async () => {
       try {
-        const res = await axiosJWT.get(`http://localhost:6001/report?id=${id}`, {
+        const res = await axiosJWT.get(`http://localhost:5000/report?id=${id}`, {
           headers: {
             'auth-token-access': accessToken
           }
         })
+        console.log(res)
         setReportTable(res.data);
       }
       catch (err) {
@@ -25,7 +26,7 @@ function Report({ id, accessToken, setAccessToken, refreshToken }) {
 
   const refreshAccessToken = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/requestNewAccessToken", {}, {
+      const res = await axios.post("http://localhost:5001/requestNewAccessToken", {}, {
         headers: {
           'auth-token-refresh': refreshToken
         }
@@ -85,7 +86,9 @@ function Report({ id, accessToken, setAccessToken, refreshToken }) {
     <>
       <div>Report {id && id}</div>
       <div> 
+        <ul>
       {reportTable.constructor === Array ? asArray() : asHashmap()}
+      </ul>
       </div>
     </>
   )

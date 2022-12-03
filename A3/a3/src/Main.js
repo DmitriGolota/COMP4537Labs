@@ -35,6 +35,10 @@ function Main() {
     }
   }, [])
 
+  const jumpToAdminLogin = () => {
+    window.location.href = "/adminLogin"
+    }
+    
 
   const indexOfLastRecord = currentPage * pokemonsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - pokemonsPerPage;
@@ -43,6 +47,7 @@ function Main() {
 
   return (
     <>
+    <button onClick={jumpToAdminLogin}>Login As Administrator</button>
       < AdvancedFilter
         setCurrentPage={setCurrentPage}
         pokemons={pokemons}

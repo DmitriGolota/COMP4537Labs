@@ -21,7 +21,7 @@ const auth = (req, res, next) => {
   const adminAuth = (req, res, next) => {
     pokeUser.findOne({ username: "admin" }).then((user) => {
       if(user.active === true && user.token) {
-        jwt.verify(user.token, process.env.TOKEN_SECRET)
+        jwt.verify(user.token, process.env.ACCESS_TOKEN_SECRET)
         console.log(`authenticated admin`)
         next()
       } else {

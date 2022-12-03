@@ -1,18 +1,16 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
-const pokeUser = require('../server/pokeUser.js')
 const cors = require('cors')
 const fetch = require('node-fetch')
 const dotenv = require("dotenv")
-// const bcrypt = require("bcrypt")
-// const jwt = require('jsonwebtoken')
-const {auth, adminAuth} = require('./auth')
+const { routeLogger } = require("./routeLogger.js")
+const {adminAuth} = require('./auth')
 const cookieParser = require('cookie-parser')
+const { AccessLog } = require("./logServerAccessModel.js")
 
 
 const app = express()
-const port = 8000
 
 // URLs
 const POKEDEX_URL = 'https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json'
@@ -46,6 +44,13 @@ const asyncWrapper = (fn) => {
         }
     }
 }
+
+const previousDate = () => {
+    const dateLimit = 10;
+    const date = new Date()
+    date.setDate(date.getDate() - dateLimit)
+    return date
+  }
 
 // Data processing
 async function getPokemonData() {
@@ -98,7 +103,7 @@ async function populateDatabase() {
 
 }
 
-app.listen(process.env.PORT || 8000, async function (err) {
+app.listen(process.env.PORT, async function (err) {
     try {
         await mongoose.connect(process.env.DB_STRING, { dbName: 'A1-Pokedex' })
         console.log("Connected to DB Successfully!")
@@ -110,11 +115,11 @@ app.listen(process.env.PORT || 8000, async function (err) {
     } catch (error) {
         console.log('db error');
     }
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Example app listening on port ${process.env.PORT}`)
 })
-app.use(cors())
 
-app.use(auth)
+app.use(routeLogger)
+// app.use(auth)
 app.get("/api/v1/pokemonsAdvancedFiltering", asyncWrapper(async (req, res) => {
     const { id,
         base,
@@ -239,10 +244,6 @@ app.get('/api/doc', (req, res) => {
     res.sendFile('/Users/dimagolota/Documents/Term 4/COMP 4537 - Internet Software Architecture/A1/APIDoc.md')
 })
 
-app.get('/*', asyncWrapper(async (req, res, next) => {
-    return (next(new PokemonNoSuchRouteError))
-    // res.status(404).json({ msg: 'Improper route. Check API docs plz.' })
-}))
 
 
 // Below are Admin routes
@@ -371,7 +372,7 @@ app.get('/report', async (req, res) => {
     switch (id) {
       case "1":
         let usernames = new Set()
-        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
           if (err) {
             console.log(err)
             res.json({ msg: "Error" })
@@ -385,7 +386,7 @@ app.get('/report', async (req, res) => {
         break;
       case "2":
         let userCount = {}
-        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
           if (err) {
             console.log(err)
             res.json({ msg: "Error" })
@@ -403,7 +404,7 @@ app.get('/report', async (req, res) => {
         break;
       case "3":
         let endpoint = {}
-        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
           if (err) {
             console.log(err)
             res.json({ msg: "Error" })
@@ -427,8 +428,7 @@ app.get('/report', async (req, res) => {
         })
         break;
       case "4":
-        AccessLog.find({responseStatus: {$gte: 400, $lt: 500}, date: {$gte: fiveDaysAgo()}}, (err, docs) => {
-          console.log("entering 4")
+        AccessLog.find({responseStatus: {$gte: 400, $lt: 500}, date: {$gte: previousDate()}}, (err, docs) => {
           if (err) {
             console.log(err)
             res.json({ msg: "Error" })
@@ -438,8 +438,7 @@ app.get('/report', async (req, res) => {
         })
         break
       case "5":
-        AccessLog.find({responseStatus: {$gte: 400, $lt: 600}, date: {$gte: fiveDaysAgo()}}, (err, docs) => {
-          console.log("entering 5")
+        AccessLog.find({responseStatus: {$gte: 400, $lt: 600}, date: {$gte: previousDate()}}, (err, docs) => {
           if(err) {
             console.log(err)
             res.json({ msg: "Error" })
