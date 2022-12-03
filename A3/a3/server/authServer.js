@@ -5,6 +5,8 @@ const dotenv = require("dotenv")
 dotenv.config();
 const pokeUser = require('./pokeUser.js')
 const {connectDB} = require("./connectDB.js")
+const cors = require('cors')
+
 const {
   PokemonBadRequest,
   PokemonDbError,
@@ -16,6 +18,9 @@ const bcrypt = require("bcrypt")
 const app = express()
 dotenv.config();
 app.use(express.json())
+app.use(cors({
+  exposedHeaders: ['auth-token-access', 'auth-token-refresh']
+}))
 
 // Async Wrapper
 const asyncWrapper = (fn) => {

@@ -1,7 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const pokemonSchema = require('./pokemon-schema')
-const pokeUser = require('./pokeUser')
+const pokeUser = require('../server/pokeUser.js')
 const cors = require('cors')
 const fetch = require('node-fetch')
 const dotenv = require("dotenv")
@@ -112,7 +112,7 @@ app.listen(process.env.PORT || 8000, async function (err) {
     }
     console.log(`Example app listening on port ${port}`)
 })
-
+app.use(cors())
 
 app.use(auth)
 app.get("/api/v1/pokemonsAdvancedFiltering", asyncWrapper(async (req, res) => {
@@ -365,4 +365,91 @@ app.delete('/api/v1/pokemon/:id', asyncWrapper(async (req, res, next) => {
     })
     return
 }))
+
+app.get('/report', async (req, res) => {
+    const id = req.query.id
+    switch (id) {
+      case "1":
+        let usernames = new Set()
+        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+          if (err) {
+            console.log(err)
+            res.json({ msg: "Error" })
+          } else {
+            docs.forEach(doc => {
+              usernames.add(doc.username)
+            })
+            res.json({ msg: "Success", report: [...usernames] })
+          }
+        })
+        break;
+      case "2":
+        let userCount = {}
+        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+          if (err) {
+            console.log(err)
+            res.json({ msg: "Error" })
+          } else {
+            docs.forEach(doc => {
+              if (userCount[doc.username]) {
+                userCount[doc.username] += 1
+              } else {
+                userCount[doc.username] = 1
+              }
+            })
+            res.json({ msg: "Success", report: userCount })
+          }
+        })
+        break;
+      case "3":
+        let endpoint = {}
+        AccessLog.find({date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+          if (err) {
+            console.log(err)
+            res.json({ msg: "Error" })
+          } else {
+            docs.forEach(doc => {
+              if (endpoint[doc.endpoint]) {
+                if (endpoint[doc.endpoint][doc.username]) {
+                  endpoint[doc.endpoint][doc.username] += 1
+                } else {
+                  endpoint[doc.endpoint][doc.username] = 1
+                }
+              } else {
+                // need to add this bluff to do the second line
+                endpoint[doc.endpoint] = { "bluf": 1 }
+                endpoint[doc.endpoint][doc.username] = 1
+              }
+            })
+            console.log(delete endpoint["bluf"])
+          }
+          res.json({ msg: "Success", report: endpoint })
+        })
+        break;
+      case "4":
+        AccessLog.find({responseStatus: {$gte: 400, $lt: 500}, date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+          console.log("entering 4")
+          if (err) {
+            console.log(err)
+            res.json({ msg: "Error" })
+          } else {
+            res.json({ msg: "Success", report: docs })
+          }
+        })
+        break
+      case "5":
+        AccessLog.find({responseStatus: {$gte: 400, $lt: 600}, date: {$gte: fiveDaysAgo()}}, (err, docs) => {
+          console.log("entering 5")
+          if(err) {
+            console.log(err)
+            res.json({ msg: "Error" })
+          } else {
+            res.json({ msg: "Success", report: docs })
+          }
+        })
+        break
+      default:
+        res.json({ msg: "Invalid report id" })
+    }
+})
 
