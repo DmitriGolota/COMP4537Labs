@@ -5,7 +5,7 @@ const cors = require('cors')
 const fetch = require('node-fetch')
 const dotenv = require("dotenv")
 const { routeLogger } = require("./routeLogger.js")
-const {adminAuth} = require('./auth')
+const { adminAuth } = require('./auth')
 const cookieParser = require('cookie-parser')
 const { AccessLog } = require("./logServerAccessModel.js")
 
@@ -50,7 +50,7 @@ const previousDate = () => {
     const date = new Date()
     date.setDate(date.getDate() - dateLimit)
     return date
-  }
+}
 
 // Data processing
 async function getPokemonData() {
@@ -370,85 +370,85 @@ app.delete('/api/v1/pokemon/:id', asyncWrapper(async (req, res, next) => {
 app.get('/report', async (req, res) => {
     const id = req.query.id
     switch (id) {
-      case "1":
-        let usernames = new Set()
-        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
-          if (err) {
-            console.log(err)
-            res.json({ msg: "Error" })
-          } else {
-            docs.forEach(doc => {
-              usernames.add(doc.username)
-            })
-            res.json({ msg: "Success", report: [...usernames] })
-          }
-        })
-        break;
-      case "2":
-        let userCount = {}
-        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
-          if (err) {
-            console.log(err)
-            res.json({ msg: "Error" })
-          } else {
-            docs.forEach(doc => {
-              if (userCount[doc.username]) {
-                userCount[doc.username] += 1
-              } else {
-                userCount[doc.username] = 1
-              }
-            })
-            res.json({ msg: "Success", report: userCount })
-          }
-        })
-        break;
-      case "3":
-        let endpoint = {}
-        AccessLog.find({date: {$gte: previousDate()}}, (err, docs) => {
-          if (err) {
-            console.log(err)
-            res.json({ msg: "Error" })
-          } else {
-            docs.forEach(doc => {
-              if (endpoint[doc.endpoint]) {
-                if (endpoint[doc.endpoint][doc.username]) {
-                  endpoint[doc.endpoint][doc.username] += 1
+        case "1":
+            let usernames = new Set()
+            AccessLog.find({ date: { $gte: previousDate() } }, (err, docs) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ msg: "Error" })
                 } else {
-                  endpoint[doc.endpoint][doc.username] = 1
+                    docs.forEach(doc => {
+                        usernames.add(doc.username)
+                    })
+                    res.json({ msg: "Success", report: [...usernames] })
                 }
-              } else {
-                // need to add this bluff to do the second line
-                endpoint[doc.endpoint] = { "bluf": 1 }
-                endpoint[doc.endpoint][doc.username] = 1
-              }
             })
-            console.log(delete endpoint["bluf"])
-          }
-          res.json({ msg: "Success", report: endpoint })
-        })
-        break;
-      case "4":
-        AccessLog.find({responseStatus: {$gte: 400, $lt: 500}, date: {$gte: previousDate()}}, (err, docs) => {
-          if (err) {
-            console.log(err)
-            res.json({ msg: "Error" })
-          } else {
-            res.json({ msg: "Success", report: docs })
-          }
-        })
-        break
-      case "5":
-        AccessLog.find({responseStatus: {$gte: 400, $lt: 600}, date: {$gte: previousDate()}}, (err, docs) => {
-          if(err) {
-            console.log(err)
-            res.json({ msg: "Error" })
-          } else {
-            res.json({ msg: "Success", report: docs })
-          }
-        })
-        break
-      default:
-        res.json({ msg: "Invalid report id" })
+            break;
+        case "2":
+            let userCount = {}
+            AccessLog.find({ date: { $gte: previousDate() } }, (err, docs) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ msg: "Error" })
+                } else {
+                    docs.forEach(doc => {
+                        if (userCount[doc.username]) {
+                            userCount[doc.username] += 1
+                        } else {
+                            userCount[doc.username] = 1
+                        }
+                    })
+                    res.json({ msg: "Success", report: userCount })
+                }
+            })
+            break;
+        case "3":
+            let endpoint = {}
+            AccessLog.find({ date: { $gte: previousDate() } }, (err, docs) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ msg: "Error" })
+                } else {
+                    docs.forEach(doc => {
+                        if (endpoint[doc.endpoint]) {
+                            if (endpoint[doc.endpoint][doc.username]) {
+                                endpoint[doc.endpoint][doc.username] += 1
+                            } else {
+                                endpoint[doc.endpoint][doc.username] = 1
+                            }
+                        } else {
+                            // need to add this bluff to do the second line
+                            endpoint[doc.endpoint] = { "num": 1 }
+                            endpoint[doc.endpoint][doc.username] = 1
+                        }
+                    })
+                    console.log(delete endpoint["num"])
+                }
+                res.json({ msg: "Success", report: endpoint })
+            })
+            break;
+        case "4":
+            AccessLog.find({ responseStatus: { $gte: 400, $lt: 500 }, date: { $gte: previousDate() } }, (err, docs) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ msg: "Error" })
+                } else {
+                    res.json({ msg: "Success", report: docs })
+                }
+            })
+            break
+        case "5":
+            AccessLog.find({ responseStatus: { $gte: 400, $lt: 600 }, date: { $gte: previousDate() } }, (err, docs) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ msg: "Error" })
+                } else {
+                    res.json({ msg: "Success", report: docs })
+                }
+            })
+            break
+        default:
+            res.json({ msg: "Invalid report id" })
     }
 })
 
