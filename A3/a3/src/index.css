@@ -15,6 +15,7 @@ code {
 .active:active {
   color: red;
 }
+
 .focus:focus {
   color: red;
   background-color: rgb(158, 158, 158);

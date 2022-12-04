@@ -87,7 +87,6 @@ async function populateDatabase() {
         pokemonData[i].type.forEach(element => {
             currentPokemonTypes.push((types.find(({ english }) => english == element)))
         });
-
         let newPokemon = new pokemonSchema({
             id: pokemonData[i].id,
             name: pokemonData[i].name,
@@ -95,7 +94,6 @@ async function populateDatabase() {
             base: pokemonData[i].base
         })
         newPokemon.save().then(newPokemonEntry => {
-            // console.log(newPokemonEntry)
         }).catch(err => {
             console.log(err)
         })
@@ -119,7 +117,6 @@ app.listen(process.env.PORT, async function (err) {
 })
 
 app.use(routeLogger)
-// app.use(auth)
 app.get("/api/v1/pokemonsAdvancedFiltering", asyncWrapper(async (req, res) => {
     const { id,
         base,

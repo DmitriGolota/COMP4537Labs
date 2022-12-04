@@ -30,7 +30,7 @@ function Pokemon(props) {
     <>
     <div>
       <PokemonImage id={getThreeDigitId(props.pokemon.id)} handleOpen={handleOpen}/>
-      {/* <img src={`https://github.com/fanzeyi/pokemon.json/raw/master/images/${getThreeDigitId(props.pokemon.id)}.png`} /> */}
+      
       <Modal
                 open={open}
                 onClose={handleClose}

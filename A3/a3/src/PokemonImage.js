@@ -7,10 +7,9 @@ function PokeImage(props) {
         marginRight: "auto"
     }
 
-
     return (
         <>
-            <img src={`https://github.com/fanzeyi/pokemon.json/raw/master/images/${props.id}.png`} alt="" style={img_style} onClick={props.handleOpen}/>
+            <img src={`https://github.com/fanzeyi/pokemon.json/raw/master/images/${props.id}.png`} alt="" style={img_style} onClick={props.handleOpen} />
         </>
     );
 }

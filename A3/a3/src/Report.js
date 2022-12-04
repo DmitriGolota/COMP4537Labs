@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import jwt_decode from "jwt-decode";
 
-
+const axiosJWT = axios.create()
 
 function Report({ id, accessToken, setAccessToken, refreshToken }) {
   const [reportTable, setReportTable] = useState('');
@@ -31,14 +31,12 @@ function Report({ id, accessToken, setAccessToken, refreshToken }) {
           'auth-token-refresh': refreshToken
         }
       });
-      // setAccessToken(res.headers['auth-token-access']);
       return res.headers['auth-token-access']
     } catch (err) {
       console.log(err);
     }
   };
 
-  const axiosJWT = axios.create()
 
   axiosJWT.interceptors.request.use(
     async (config) => {
@@ -85,10 +83,10 @@ function Report({ id, accessToken, setAccessToken, refreshToken }) {
   return (
     <>
       <div>Report {id && id}</div>
-      <div> 
+      <div>
         <ul>
-      {reportTable.constructor === Array ? asArray() : asHashmap()}
-      </ul>
+          {reportTable.constructor === Array ? asArray() : asHashmap()}
+        </ul>
       </div>
     </>
   )

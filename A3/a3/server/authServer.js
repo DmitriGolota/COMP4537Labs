@@ -4,7 +4,7 @@ const { handleError } = require("./errorHandler.js")
 const dotenv = require("dotenv")
 dotenv.config();
 const pokeUser = require('./pokeUser.js')
-const {connectDB} = require("./connectDB.js")
+const { connectDB } = require("./connectDB.js")
 const cors = require('cors')
 
 const {
@@ -24,13 +24,13 @@ app.use(cors({
 
 // Async Wrapper
 const asyncWrapper = (fn) => {
-    return async (req, res, next) => {
-        try {
-            await fn(req, res, next)
-        } catch (error) {
-            console.log(error)
-        }
+  return async (req, res, next) => {
+    try {
+      await fn(req, res, next)
+    } catch (error) {
+      console.log(error)
     }
+  }
 }
 
 const startAuthServer = asyncWrapper(async () => {
@@ -45,53 +45,50 @@ const startAuthServer = asyncWrapper(async () => {
 })
 
 startAuthServer()
-
 // Register User
 app.post('/register', asyncWrapper(async (req, res) => {
-    const { username, password, email } = req.body
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    const userWithHashedPassword = { ...req.body, password: hashedPassword }
-
-    const user = await pokeUser.create(userWithHashedPassword)
-
-    res.send(user)
+  const { username, password, email } = req.body
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(password, salt)
+  const userWithHashedPassword = { ...req.body, password: hashedPassword }
+  const user = await pokeUser.create(userWithHashedPassword)
+  res.send(user)
 }))
 
 // Login User
 app.post('/login', asyncWrapper(async (req, res) => {
-    const { username, password } = req.body
-    const user = await pokeUser.findOne({ username: username })
-    if (!user) {
-        throw new PokemonBadRequest("User not found")
-    }
-    const isPasswordCorrect = await bcrypt.compare(password, user.password)
-    if (!isPasswordCorrect) {
-        throw new PokemonBadRequest("Password is incorrect")
-    }
- 
-    const accessToken = jwt.sign({ user: user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' })
-    const refreshToken = jwt.sign({ user: user }, process.env.REFRESH_TOKEN_SECRET)
-    refreshTokens.push(refreshToken)
-  
-    res.header('auth-token-access', accessToken)
-    res.header('auth-token-refresh', refreshToken)
-    res.header('username', user.username)
-  
-    res.send(user)
+  const { username, password } = req.body
+  const user = await pokeUser.findOne({ username: username })
+  if (!user) {
+    throw new PokemonBadRequest("User not found")
+  }
+  const isPasswordCorrect = await bcrypt.compare(password, user.password)
+  if (!isPasswordCorrect) {
+    throw new PokemonBadRequest("Password is incorrect")
+  }
+
+  const accessToken = jwt.sign({ user: user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '120s' })
+  const refreshToken = jwt.sign({ user: user }, process.env.REFRESH_TOKEN_SECRET)
+  refreshTokens.push(refreshToken)
+
+  res.header('auth-token-access', accessToken)
+  res.header('auth-token-refresh', refreshToken)
+  res.header('username', user.username)
+
+  res.send(user)
 }))
 
 app.post('/logout', asyncWrapper(async (req, res) => {
-    await pokeUser.findOneAndUpdate({username: req.body.username}, {active: false})
-    res.clearCookie('admin')
-    res.send("User Logged Out")
-  }))
+  await pokeUser.findOneAndUpdate({ username: req.body.username }, { active: false })
+  res.clearCookie('admin')
+  res.send("User Logged Out")
+}))
+
 
 app.use(handleError)
 
-let refreshTokens = [] // replace with a db
+let refreshTokens = []
 app.post('/requestNewAccessToken', asyncWrapper(async (req, res) => {
-  // console.log(req.headers);
   const refreshToken = req.header('auth-token-refresh')
   if (!refreshToken) {
     throw new PokemonBadRequest("No Token: Please provide a token.")
@@ -110,7 +107,7 @@ app.post('/requestNewAccessToken', asyncWrapper(async (req, res) => {
     throw new PokemonBadRequest("Invalid Token: Please provide a valid token.")
   }
 }))
-module.export  = {asyncWrapper}
+module.export = { asyncWrapper }
 
 
 

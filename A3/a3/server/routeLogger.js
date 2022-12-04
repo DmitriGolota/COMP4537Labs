@@ -15,11 +15,11 @@ const asyncWrapper = (fn) => {
 
 const ignoredRoutes = ['/report']
 
-const routeLogger = asyncWrapper( async (req, res, next) => {
+const routeLogger = asyncWrapper(async (req, res, next) => {
     try {
         if (!ignoredRoutes.includes(req.path)) {
             const newLog = await AccessLog.create({
-                username: req.header('username')? req.header('username') : 'xxxxxxx',
+                username: req.header('username') ? req.header('username') : 'xxxxxxx',
                 endpoint: req.path,
                 method: req.method,
             })
@@ -30,7 +30,7 @@ const routeLogger = asyncWrapper( async (req, res, next) => {
         }
     } catch (error) {
         throw new PokemonBadRequest("Error occured while logging route")
-        
+
     }
 })
 

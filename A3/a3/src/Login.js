@@ -7,7 +7,6 @@ function Login(props) {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
